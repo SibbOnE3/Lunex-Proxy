@@ -5,9 +5,6 @@ const error = document.getElementById('uv-error');
 const errorCode = document.getElementById('uv-error-code');
 const loadingRing = document.getElementById('loading');
 
-// 💥 THE FIX: Added 'BareMux.' before the connection command 💥
-const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-
 form.addEventListener('submit', async event => {
     event.preventDefault();
     
@@ -28,21 +25,6 @@ form.addEventListener('submit', async event => {
 
     const url = search(address.value, searchEngine.value);
     
-    // Configure the secure routing transport
-    let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
-    
-    try {
-        if (await connection.getTransport() !== "/epoxy/index.mjs") {
-            await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
-        }
-    } catch (err) {
-        loadingRing.style.display = 'none';
-        error.style.display = 'block';
-        error.textContent = 'Failed to establish secure tunnel.';
-        errorCode.textContent = err.toString();
-        throw err;
-    }
-
-    // Launch the site
+    // Launch the site using UV's native router
     window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
