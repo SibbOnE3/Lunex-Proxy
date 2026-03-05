@@ -40,7 +40,7 @@
             text-align: center;
             width: 100%;
             max-width: 600px;
-            padding: 20px;
+            padding: 32px 20px;
             background: rgba(15, 20, 35, 0.4);
             border: 1px solid var(--stroke);
             border-radius: 24px;
@@ -49,29 +49,29 @@
         }
         .logo {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 38px;
+            font-weight: 800;
             margin-bottom: 8px;
             background: linear-gradient(135deg, var(--brand1), var(--brand3));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
         .subtitle {
             color: var(--muted);
-            font-size: 14px;
+            font-size: 15px;
             margin-bottom: 24px;
+            font-weight: 500;
         }
         #uv-form {
             display: flex;
             width: 100%;
             position: relative;
         }
-        #uv-search-engine {
-            display: none; 
-        }
+        #uv-search-engine { display: none; }
         #uv-address {
             width: 100%;
-            padding: 16px 24px;
+            padding: 18px 24px;
             border-radius: 999px;
             background: rgba(0,0,0,0.4);
             border: 1px solid var(--stroke);
@@ -79,36 +79,42 @@
             font-size: 15px;
             outline: none;
             transition: all 0.3s ease;
+            text-align: center;
         }
         #uv-address:focus {
             border-color: var(--brand1);
             box-shadow: 0 0 0 4px rgba(139,92,246,0.2);
             background: rgba(0,0,0,0.6);
         }
-        .desc {
-            margin-top: 16px;
-            font-size: 13px;
-            color: var(--muted);
+        
+        /* Loading Ring */
+        .loading-ring {
+            display: none; /* Hidden by default */
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--brand1);
+            animation: spin 1s ease-in-out infinite;
+            margin-top: 20px;
         }
-        .error {
-            color: #ef4444;
-            margin-top: 10px;
-            font-size: 13px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .desc { margin-top: 16px; font-size: 13px; color: var(--brand1); font-weight: 600; display: none; }
+        .error { color: #ef4444; margin-top: 10px; font-size: 13px; white-space: pre-wrap; word-wrap: break-word; }
     </style>
 </head>
 <body>
     <div class="engine-container">
-        <div class="logo">Stealth Engine</div>
-        <div class="subtitle">Unrestricted web access. Routed securely.</div>
+        <div class="logo">Lunex Engine</div>
+        <div class="subtitle">Secure. Invisible. Unrestricted.</div>
         
         <form id="uv-form">
             <input id="uv-search-engine" value="https://www.google.com/search?q=%s" type="hidden"/> 
-            <input id="uv-address" type="text" placeholder="Search Google or type a URL (e.g., discord.com)"/>
+            <input id="uv-address" type="text" placeholder="Search the web or type a URL (e.g., discord.com)"/>
         </form>
         
+        <div class="loading-ring" id="loading"></div>
         <p class="desc" id="uv-error"></p>
         <pre class="error" id="uv-error-code"></pre>
     </div>
