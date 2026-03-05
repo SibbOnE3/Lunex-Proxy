@@ -5,8 +5,8 @@ const error = document.getElementById('uv-error');
 const errorCode = document.getElementById('uv-error-code');
 const loadingRing = document.getElementById('loading');
 
-// 💥 THE MISSING ENGINE ROUTER 💥
-const connection = new BareMuxConnection("/baremux/worker.js");
+// 💥 THE FIX: Added 'BareMux.' before the connection command 💥
+const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
 
 form.addEventListener('submit', async event => {
     event.preventDefault();
