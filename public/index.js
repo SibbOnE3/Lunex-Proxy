@@ -8,15 +8,14 @@ const loadingRing = document.getElementById('loading');
 form.addEventListener('submit', async event => {
     event.preventDefault();
     
-    // Show the Lunex loading ring and hide any old errors
-    loadingRing.style.display = 'inline-block';
+    // Show UI Loading
+    loadingRing.style.display = 'block';
     error.style.display = 'none';
     errorCode.textContent = '';
 
     try {
         await registerSW();
     } catch (err) {
-        // If the engine fails to boot, show the error cleanly
         loadingRing.style.display = 'none';
         error.style.display = 'block';
         error.textContent = 'Failed to boot the Lunex Stealth Engine.';
@@ -25,7 +24,5 @@ form.addEventListener('submit', async event => {
     }
 
     const url = search(address.value, searchEngine.value);
-    
-    // Route the traffic through the engine
     window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
