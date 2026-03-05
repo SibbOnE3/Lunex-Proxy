@@ -11,17 +11,20 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   loadingRing.style.display = "block";
-  error.style.display = "none";
-  errorCode.textContent = "";
+  if (error) error.style.display = "none";
+  if (errorCode) errorCode.textContent = "";
 
   try {
     await registerSW();
+    
+    // 💥 CRITICAL FIX: Do not load the site until the Service Worker is fully ready 💥
+    await navigator.serviceWorker.ready;
+    
   } catch (err) {
     loadingRing.style.display = "none";
-    error.style.display = "block";
-    error.textContent = "Failed to register Service Worker.";
-    errorCode.textContent = err.toString();
-    throw err;
+    if (error) error.style.display = "block";
+    if (errorCode) errorCode.textContent = err.toString();
+    return;
   }
 
   const url = search(address.value, searchEngine.value);
