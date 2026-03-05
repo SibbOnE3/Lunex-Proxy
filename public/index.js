@@ -5,7 +5,7 @@ const error = document.getElementById('uv-error');
 const errorCode = document.getElementById('uv-error-code');
 const loadingRing = document.getElementById('loading');
 
-// Initialize the secure tunnel
+// Initialize the secure tunnel connection
 const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
 
 form.addEventListener('submit', async event => {
