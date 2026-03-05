@@ -5,10 +5,12 @@ const error = document.getElementById('uv-error');
 const errorCode = document.getElementById('uv-error-code');
 const loadingRing = document.getElementById('loading');
 
+// Initialize the secure tunnel
+const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+
 form.addEventListener('submit', async event => {
     event.preventDefault();
     
-    // Show UI Loading
     loadingRing.style.display = 'block';
     error.style.display = 'none';
     errorCode.textContent = '';
@@ -18,13 +20,26 @@ form.addEventListener('submit', async event => {
     } catch (err) {
         loadingRing.style.display = 'none';
         error.style.display = 'block';
-        error.textContent = 'Failed to boot the Lunex Stealth Engine.';
+        error.textContent = 'Failed to register Service Worker.';
         errorCode.textContent = err.toString();
         throw err;
     }
 
     const url = search(address.value, searchEngine.value);
+    let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
     
-    // Launch the site using UV's native router
+    try {
+        if (await connection.getTransport() !== "/epoxy/index.mjs") {
+            await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
+        }
+    } catch (err) {
+        loadingRing.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = 'Failed to connect to the secure tunnel.';
+        errorCode.textContent = err.toString();
+        throw err;
+    }
+
+    // Launch the site
     window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
