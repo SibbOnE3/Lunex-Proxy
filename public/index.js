@@ -2,20 +2,28 @@
 
 const form = document.getElementById("uv-form");
 const address = document.getElementById("uv-address");
-const loading = document.getElementById("loading");
+const searchEngine = document.getElementById("uv-search-engine");
+const error = document.getElementById("uv-error");
+const errorCode = document.getElementById("uv-error-code");
+const loadingRing = document.getElementById("loading");
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  loading.style.display = "block";
+
+  loadingRing.style.display = "block";
+  error.style.display = "none";
+  errorCode.textContent = "";
 
   try {
     await registerSW();
   } catch (err) {
-    alert("Engine Registration Failed: " + err.message);
-    loading.style.display = "none";
+    loadingRing.style.display = "none";
+    error.style.display = "block";
+    error.textContent = "Failed to register Service Worker.";
+    errorCode.textContent = err.toString();
     throw err;
   }
 
-  const url = search(address.value, "https://www.google.com/search?q=%s");
+  const url = search(address.value, searchEngine.value);
   location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
