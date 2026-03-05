@@ -10,10 +10,11 @@ async function registerSW() {
     scope: __uv$config.prefix,
   });
 
-  // Establish the Wisp Transport using the official UV v3 method
+  // 💥 THE FIX: Properly initialize the BareMux connection before checking transport 💥
+  const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
   let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
   
-  if (await BareMux.getConnectionTransport() !== "/epoxy/index.mjs") {
-    await BareMux.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
+  if (await connection.getTransport() !== "/epoxy/index.mjs") {
+    await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
   }
 }
