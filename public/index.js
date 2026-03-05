@@ -1,33 +1,50 @@
 "use strict";
-
+/**
+ * @type {HTMLFormElement}
+ */
 const form = document.getElementById("uv-form");
+/**
+ * @type {HTMLInputElement}
+ */
 const address = document.getElementById("uv-address");
+/**
+ * @type {HTMLInputElement}
+ */
 const searchEngine = document.getElementById("uv-search-engine");
+/**
+ * @type {HTMLParagraphElement}
+ */
 const error = document.getElementById("uv-error");
+/**
+ * @type {HTMLPreElement}
+ */
 const errorCode = document.getElementById("uv-error-code");
-const loadingRing = document.getElementById("loading");
+const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
 
 form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  loadingRing.style.display = "block";
-  if (error) error.style.display = "none";
-  if (errorCode) errorCode.textContent = "";
+	event.preventDefault();
 
-  try {
-    console.log("🟢 1. Booting the Stealth Router...");
-    await registerSW();
-    console.log("🟢 2. Router Booted Successfully.");
-  } catch (err) {
-    loadingRing.style.display = "none";
-    if (error) error.style.display = "block";
-    if (errorCode) errorCode.textContent = err.toString();
-    console.error("🔴 Crash during boot:", err);
-    return;
-  }
+	try {
+		await registerSW();
+	} catch (err) {
+		error.textContent = "Failed to register service worker.";
+		errorCode.textContent = err.toString();
+		throw err;
+	}
 
-  const url = search(address.value, searchEngine.value);
-  const destination = __uv$config.prefix + __uv$config.encodeUrl(url);
-  
-  console.log("🟢 3. Tunneling traffic to:", destination);
-  location.href = destination;
+	const url = search(address.value, searchEngine.value);
+
+	let frame = document.getElementById("uv-frame");
+	frame.style.display = "block";
+	let wispUrl =
+		(location.protocol === "https:" ? "wss" : "ws") +
+		"://" +
+		location.host +
+		"/wisp/";
+	if ((await connection.getTransport()) !== "/epoxy/index.mjs") {
+		await connection.setTransport("/epoxy/index.mjs", [
+			{ wisp: wispUrl },
+		]);
+	}
+	frame.src = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
