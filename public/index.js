@@ -1,50 +1,31 @@
-"use strict";
-/**
- * @type {HTMLFormElement}
- */
-const form = document.getElementById("uv-form");
-/**
- * @type {HTMLInputElement}
- */
-const address = document.getElementById("uv-address");
-/**
- * @type {HTMLInputElement}
- */
-const searchEngine = document.getElementById("uv-search-engine");
-/**
- * @type {HTMLParagraphElement}
- */
-const error = document.getElementById("uv-error");
-/**
- * @type {HTMLPreElement}
- */
-const errorCode = document.getElementById("uv-error-code");
-const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+const form = document.getElementById('uv-form');
+const address = document.getElementById('uv-address');
+const searchEngine = document.getElementById('uv-search-engine');
+const error = document.getElementById('uv-error');
+const errorCode = document.getElementById('uv-error-code');
+const loadingRing = document.getElementById('loading');
 
-form.addEventListener("submit", async (event) => {
-	event.preventDefault();
+form.addEventListener('submit', async event => {
+    event.preventDefault();
+    
+    // Show the Lunex loading ring and hide any old errors
+    loadingRing.style.display = 'inline-block';
+    error.style.display = 'none';
+    errorCode.textContent = '';
 
-	try {
-		await registerSW();
-	} catch (err) {
-		error.textContent = "Failed to register service worker.";
-		errorCode.textContent = err.toString();
-		throw err;
-	}
+    try {
+        await registerSW();
+    } catch (err) {
+        // If the engine fails to boot, show the error cleanly
+        loadingRing.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = 'Failed to boot the Lunex Stealth Engine.';
+        errorCode.textContent = err.toString();
+        throw err;
+    }
 
-	const url = search(address.value, searchEngine.value);
-
-	let frame = document.getElementById("uv-frame");
-	frame.style.display = "block";
-	let wispUrl =
-		(location.protocol === "https:" ? "wss" : "ws") +
-		"://" +
-		location.host +
-		"/wisp/";
-	if ((await connection.getTransport()) !== "/epoxy/index.mjs") {
-		await connection.setTransport("/epoxy/index.mjs", [
-			{ wisp: wispUrl },
-		]);
-	}
-	frame.src = __uv$config.prefix + __uv$config.encodeUrl(url);
+    const url = search(address.value, searchEngine.value);
+    
+    // Route the traffic through the engine
+    window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 });
