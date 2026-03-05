@@ -5,11 +5,12 @@ async function registerSW() {
     throw new Error("Your browser doesn't support service workers.");
   }
 
-  // 💥 THE FIX: Registering the correct master worker, NOT the raw uv worker 💥
-  await navigator.serviceWorker.register("/sw.js", {
+  // 💥 THE FIX: Pointing back to the correct path that actually exists 💥
+  await navigator.serviceWorker.register("/uv/sw.js", {
     scope: __uv$config.prefix,
   });
 
+  // Open the multiplex port and establish the tunnel
   const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
   let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
   
