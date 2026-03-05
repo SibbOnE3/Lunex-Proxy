@@ -1,125 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunex Stealth Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <script src="baremux/index.js" defer></script>
-    <script src="epoxy/index.js" defer></script>
-    
-    <script src="uv/uv.bundle.js" defer></script>
-    <script src="uv/uv.config.js" defer></script>
-    <script src="register-sw.js" defer></script>
-    <script src="search.js" defer></script>
-    <script src="index.js" defer></script>
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+		/>
+		<title>Ultraviolet | Sophisticated Web Proxy</title>
+		<meta
+			name="description"
+			content="Ultraviolet is a highly sophisticated proxy used for evading internet censorship or accessing websites in a controlled sandbox using the power of service-workers. Unblock sites today!"
+		/>
+		<meta
+			name="keywords"
+			content="proxy, web proxy, ultraviolet, service workers, unblock websites, unblock chromebook, free web proxy, proxy list, proxy sites, un block chromebook, online proxy, proxy server, proxysite, proxy youtube, bypass securly, bypass iboss, bypass lightspeed filter, holy unblocker, chromebooks, titanium network, unblock youtube, youtube proxy, unblocked youtube, youtube unblocked"
+		/>
+		<meta
+			name="theme-color"
+			media="(prefers-color-scheme: dark)"
+			content="#434c5e"
+		/>
+		<meta name="googlebot" content="index, follow, snippet" />
+		<link rel="shortcut icon" content="favicon.ico" />
+		<link rel="stylesheet" href="index.css" />
+		
 
-    <style>
-        :root {
-            --bg0: #03050a; 
-            --brand1: #8b5cf6; 
-            --brand3: #0ea5e9;
-            --stroke: rgba(255,255,255,.08);
-            --txt: rgba(255,255,255,.92);
-            --muted: rgba(255,255,255,.60);
-        }
-        
-        /* 💥 FIX FOR THE OFF-CENTER SEARCH BAR 💥 */
-        * { box-sizing: border-box; } 
-        
-        body {
-            margin: 0; height: 100vh;
-            font-family: 'Inter', sans-serif;
-            color: var(--txt);
-            background: radial-gradient(circle at 50% 50%, rgba(139,92,246,0.15), var(--bg0));
-            background-color: var(--bg0);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-        }
-        #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        
-        .engine-container {
-            position: relative; z-index: 10; text-align: center;
-            width: 90%; max-width: 550px; padding: 40px;
-            background: rgba(15, 20, 35, 0.7);
-            border: 1px solid var(--stroke);
-            border-radius: 32px; backdrop-filter: blur(20px);
-            animation: float 6s ease-in-out infinite;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        
-        .logo {
-            font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800;
-            background: linear-gradient(135deg, #fff, var(--brand1));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        
-        #uv-form {
-            width: 100%; display: flex; justify-content: center; position: relative;
-        }
-        
-        #uv-address {
-            width: 100%; max-width: 450px; padding: 18px 25px; border-radius: 99px;
-            background: rgba(0,0,0,0.5); border: 1px solid var(--stroke);
-            color: #fff; font-size: 16px; text-align: center; outline: none;
-            transition: 0.3s; margin: 0 auto; display: block;
-        }
-        #uv-address:focus { border-color: var(--brand1); box-shadow: 0 0 20px rgba(139,92,246,0.3); }
-        
-        /* 💥 THE MISSING HIDDEN ELEMENTS 💥 */
-        #uv-search-engine { display: none; } 
-        .error-text { color: #ef4444; margin-top: 15px; font-size: 14px; font-weight: bold; display: none; }
-        
-        .loading-ring {
-            display: none; width: 30px; height: 30px; border: 3px solid rgba(139,92,246,0.2);
-            border-radius: 50%; border-top-color: var(--brand1);
-            animation: spin 1s linear infinite; margin: 20px auto 0;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-    <canvas id="particles-canvas"></canvas>
-    
-    <div class="engine-container">
-        <div class="logo">Lunex Engine</div>
-        <p style="color:var(--muted); margin-bottom: 30px;">Secure. Invisible. Unrestricted.</p>
-        
-        <form id="uv-form">
-            <input id="uv-search-engine" value="https://www.google.com/search?q=%s" type="hidden"/>
-            <input id="uv-address" type="text" placeholder="Search Google or enter a URL...">
-        </form>
-        
-        <div class="loading-ring" id="loading"></div>
-        <p class="error-text" id="uv-error"></p>
-        <pre class="error-text" id="uv-error-code"></pre>
-    </div>
+		<script src="baremux/index.js"></script>
+		<script src="uv/uv.bundle.js"></script>
+		<script src="uv/uv.config.js"></script>
 
-    <script>
-        // Background particles
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function init() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            particles = Array.from({length: 40}, () => ({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                r: Math.random() * 2, s: Math.random() * 0.5 + 0.1
-            }));
-        }
-        function animate() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.y -= p.s; if(p.y < 0) p.y = canvas.height;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-                ctx.fillStyle = "rgba(139,92,246,0.4)"; ctx.fill();
-            });
-            requestAnimationFrame(animate);
-        }
-        window.onresize = init; init(); animate();
-    </script>
-</body>
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "FAQPage",
+				"mainEntity": [
+					{
+						"@type": "Question",
+						"name": "What is Ultraviolet (Web Proxy)?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "Highly sophisticated proxy used for evading internet censorship or accessing websites in a controlled sandbox using the power of service-workers and more!"
+						}
+					},
+					{
+						"@type": "Question",
+						"name": "How do I unblock sites using Ultraviolet?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "Simply head to an official site featuring Ultraviolet such as Holy Unblocker or Incognito! You can also self-host Ultraviolet on your own web server for maximum privacy."
+						}
+					},
+					{
+						"@type": "Question",
+						"name": "What if Ultraviolet is blocked or not working?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "Join the Titanium Network Discord at discord.gg/unblock!"
+						}
+					}
+				]
+			}
+		</script>
+	</head>
+
+	<body>
+		<div
+			title="Ultraviolet Logo"
+			class="flex-center logo-wrapper header-center"
+		>
+			<img class="logo" src="uv.png" alt="Ultraviolet" />
+			<h1>Ultraviolet | TN</h1>
+		</div>
+		<div class="flex-center desc left-margin">
+			<p>
+				Ultraviolet is highly sophisticated proxy used for evading internet
+				censorship.
+			</p>
+		</div>
+
+		<form id="uv-form" class="flex-center">
+			<input
+				id="uv-search-engine"
+				value="https://www.google.com/search?q=%s"
+				type="hidden"
+			/>
+			<input id="uv-address" type="text" placeholder="Search the web freely" />
+		</form>
+		<div class="desc left-margin">
+			<p id="uv-error"></p>
+			<pre id="uv-error-code"></pre>
+		</div>
+		<footer>
+			<div>
+				<a
+					title="The TitaniumNetwork GitHub organization"
+					href="https://github.com/titaniumnetwork-dev"
+					>TitaniumNetwork</a
+				>
+				<a title="The TitaniumNetwork Discord" href="https://discord.gg/unblock"
+					>Discord</a
+				>
+				<a
+					title="The TompHTTP GitHub organization"
+					href="https://github.com/tomphttp"
+					>TompHTTP</a
+				>
+				<a
+					title="The official deployment repository for Ultraviolet"
+					href="https://github.com/titaniumnetwork-dev/Ultraviolet-App"
+					>GitHub</a
+				>
+				<a title="License information" href="credits.html">Credits</a>
+			</div>
+			<div>
+				<span>Ultraviolet &copy; TN 2023</span>
+			</div>
+		</footer>
+		<iframe style="display: none" id="uv-frame"></iframe>
+		<script src="register-sw.js"></script>
+		<script src="search.js"></script>
+		<script src="index.js"></script>
+	</body>
 </html>
