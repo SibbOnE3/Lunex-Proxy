@@ -6,6 +6,9 @@
     <title>Lunex Stealth Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
+    <script src="baremux/index.js" defer></script>
+    <script src="epoxy/index.js" defer></script>
+    
     <script src="uv/uv.bundle.js" defer></script>
     <script src="uv/uv.config.js" defer></script>
     <script src="register-sw.js" defer></script>
@@ -21,6 +24,10 @@
             --txt: rgba(255,255,255,.92);
             --muted: rgba(255,255,255,.60);
         }
+        
+        /* 💥 FIX FOR THE OFF-CENTER SEARCH BAR 💥 */
+        * { box-sizing: border-box; } 
+        
         body {
             margin: 0; height: 100vh;
             font-family: 'Inter', sans-serif;
@@ -30,7 +37,8 @@
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
-        #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        
         .engine-container {
             position: relative; z-index: 10; text-align: center;
             width: 90%; max-width: 550px; padding: 40px;
@@ -38,21 +46,33 @@
             border: 1px solid var(--stroke);
             border-radius: 32px; backdrop-filter: blur(20px);
             animation: float 6s ease-in-out infinite;
+            display: flex; flex-direction: column; align-items: center;
         }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
         .logo {
             font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800;
             background: linear-gradient(135deg, #fff, var(--brand1));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
         }
+        
+        #uv-form {
+            width: 100%; display: flex; justify-content: center; position: relative;
+        }
+        
         #uv-address {
-            width: 100%; padding: 18px 25px; border-radius: 99px;
+            width: 100%; max-width: 450px; padding: 18px 25px; border-radius: 99px;
             background: rgba(0,0,0,0.5); border: 1px solid var(--stroke);
             color: #fff; font-size: 16px; text-align: center; outline: none;
-            transition: 0.3s;
+            transition: 0.3s; margin: 0 auto; display: block;
         }
         #uv-address:focus { border-color: var(--brand1); box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+        
+        /* 💥 THE MISSING HIDDEN ELEMENTS 💥 */
+        #uv-search-engine { display: none; } 
+        .error-text { color: #ef4444; margin-top: 15px; font-size: 14px; font-weight: bold; display: none; }
+        
         .loading-ring {
             display: none; width: 30px; height: 30px; border: 3px solid rgba(139,92,246,0.2);
             border-radius: 50%; border-top-color: var(--brand1);
@@ -63,16 +83,23 @@
 </head>
 <body>
     <canvas id="particles-canvas"></canvas>
+    
     <div class="engine-container">
         <div class="logo">Lunex Engine</div>
         <p style="color:var(--muted); margin-bottom: 30px;">Secure. Invisible. Unrestricted.</p>
+        
         <form id="uv-form">
+            <input id="uv-search-engine" value="https://www.google.com/search?q=%s" type="hidden"/>
             <input id="uv-address" type="text" placeholder="Search Google or enter a URL...">
         </form>
+        
         <div class="loading-ring" id="loading"></div>
+        <p class="error-text" id="uv-error"></p>
+        <pre class="error-text" id="uv-error-code"></pre>
     </div>
 
     <script>
+        // Background particles
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
