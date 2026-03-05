@@ -1,28 +1,17 @@
 "use strict";
-/**
- * Distributed with Ultraviolet and compatible with most configurations.
- */
-const stockSW = "/uv/sw.js";
 
-/**
- * List of hostnames that are allowed to run serviceworkers on http://
- */
-const swAllowedHostnames = ["localhost", "127.0.0.1"];
-
-/**
- * Global util
- * Used in 404.html and index.html
- */
 async function registerSW() {
-	if (!navigator.serviceWorker) {
-		if (
-			location.protocol !== "https:" &&
-			!swAllowedHostnames.includes(location.hostname)
-		)
-			throw new Error("Service workers cannot be registered without https.");
+    if (!navigator.serviceWorker) {
+        throw new Error("Your browser doesn't support service workers.");
+    }
 
-		throw new Error("Your browser doesn't support service workers.");
-	}
+    // 1. Boot the Service Worker
+    await navigator.serviceWorker.register("/uv/sw.js", { scope: __uv$config.prefix });
 
-	await navigator.serviceWorker.register(stockSW);
+    // 2. 💥 THE FIX FOR THE YELLOW ERROR: Open the multiplex port 💥
+    const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+    
+    // 3. Establish the secure Wisp tunnel
+    let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
+    await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
 }
